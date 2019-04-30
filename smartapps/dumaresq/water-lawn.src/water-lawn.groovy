@@ -56,22 +56,25 @@ def updated(settings) {
 
 
 private isStormy(json) {
-	def STORMY = ['rain', 'snow', 'showers', 'sprinkles', 'precipitation']
-
-	def forecast = json?.forecast?.txt_forecast?.forecastday?.first()
-	log.debug "Checking Response"
-	if (forecast) {
-		def text = forecast?.fcttext?.toLowerCase()
-		if (text) {
-            log.debug "reponse is: ${text}"
-			def result = false
-			for (int i = 0; i < STORMY.size() && !result; i++) {
-				result = text.contains(STORMY[i])
-			}
-			return result
-		} else {
-			return false
-		}
+//	def STORMY = ['rain', 'snow', 'showers', 'sprinkles', 'precipitation']
+    def rain = json?.precip24Hour
+    if (rain > 0.01) {
+      log.debug "Rain is ${rain}"
+      return true 
+//	def forecast = json?.forecast?.txt_forecast?.forecastday?.first()
+//	log.debug "Checking Response"
+//	if (forecast) {
+//		def text = forecast?.fcttext?.toLowerCase()
+//		if (text) {
+//            log.debug "reponse is: ${text}"
+//			def result = false
+//			for (int i = 0; i < STORMY.size() && !result; i++) {
+//				result = text.contains(STORMY[i])
+//			}
+//			return result
+//		} else {
+//			return false
+//		}
 	} else {
 		log.warn "Did not get a forecast: $json"
 		return false
@@ -93,7 +96,8 @@ def startTimerCallback() {
         return
     }
     if (zipcode) {
-		def response = getWeatherFeature("forecast", zipcode)
+        def response = getTwcConditions(zipcode)
+		//def response = getWeatherFeature("forecast", zipcode)
 	  	if (isStormy(response)) {
     		sendNotificationEvent("${app.label}: Not Watering, the forcast calls for rain.")
             log.debug "Got Rain not Wattering"
