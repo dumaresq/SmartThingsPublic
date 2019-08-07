@@ -57,10 +57,11 @@ def updated(settings) {
 
 private isStormy(json) {
 //	def STORMY = ['rain', 'snow', 'showers', 'sprinkles', 'precipitation']
-    def rain = json?.precip24Hour
-    if (rain > 0.01) {
+//    def rain = json?.precip24Hour
+ 	def rain = json?.qpf[0]
+	if (rain > 0.5) {
       log.debug "Rain is ${rain}"
-      return true 
+      return true
 //	def forecast = json?.forecast?.txt_forecast?.forecastday?.first()
 //	log.debug "Checking Response"
 //	if (forecast) {
@@ -76,7 +77,7 @@ private isStormy(json) {
 //			return false
 //		}
 	} else {
-		log.warn "Did not get a forecast: $json"
+		log.debug "rain is ${rain}"
 		return false
 	}
 }
@@ -96,7 +97,8 @@ def startTimerCallback() {
         return
     }
     if (zipcode) {
-        def response = getTwcConditions(zipcode)
+        //def response = getTwcConditions(zipcode)
+        def response = getTwcForecast(zipcode)
 		//def response = getWeatherFeature("forecast", zipcode)
 	  	if (isStormy(response)) {
     		sendNotificationEvent("${app.label}: Not Watering, the forcast calls for rain.")
